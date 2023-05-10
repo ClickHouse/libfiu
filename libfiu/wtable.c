@@ -22,6 +22,7 @@
 #include <stdlib.h>		/* for malloc() */
 #include <string.h>		/* for memcpy()/memcmp() */
 #include <stdio.h>		/* snprintf() */
+#include <pthread.h>	/* pthread_* */
 
 #include "wtable.h"
 
