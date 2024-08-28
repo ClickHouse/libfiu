@@ -23,6 +23,12 @@
   #define trace(...) do { } while(0)
 #endif
 
+#if defined(__has_feature)
+# if __has_feature(address_sanitizer)
+#include <sanitizer/lsan_interface.h>
+# endif
+#endif
+
 
 /* Different methods to decide when a point of failure fails */
 enum pf_method {
@@ -399,6 +405,11 @@ static int insert_pf(struct pf_info *pf)
 int fiu_enable(const char *name, int failnum, void *failinfo,
 		unsigned int flags)
 {
+#if defined(__has_feature)
+# if __has_feature(address_sanitizer)
+        __lsan_disable();
+# endif
+#endif
 	struct pf_info *pf;
 
 	pf = pf_create(name, failnum, failinfo, flags, PF_ALWAYS);
@@ -406,6 +417,11 @@ int fiu_enable(const char *name, int failnum, void *failinfo,
 		return -1;
 
 	return insert_pf(pf);
+#if defined(__has_feature)
+# if __has_feature(address_sanitizer)
+        __lsan_enable();
+# endif
+#endif
 }
 
 /* Makes the given name fail with the given probability. */
