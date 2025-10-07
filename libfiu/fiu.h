@@ -19,6 +19,8 @@
 extern "C" {
 #endif
 
+#include <stdatomic.h>
+
 
 /** Initializes the library.
  *
@@ -62,12 +64,21 @@ int fiu_fail(const char *name);
  */
 void *fiu_failinfo(void);
 
+/// In production it's extremely unusual to use failpoints, but checking them has a cost (function call, global mutex lock, hash table lookup...)
+/// We've introduced this atomic variable to avoid that cost when no failpoints have been registered in the lifetime of the program
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc11-extensions"
+extern atomic_int has_any_failpoint_been_registered;
+#pragma clang diagnostic pop
+
 /** Performs the given action when the given point of failure fails. Mostly
  * used in the following macros. */
 #define fiu_do_on(name, action) \
         do { \
-                if (fiu_fail(name)) { \
-                        action; \
+                if (atomic_load_explicit(&has_any_failpoint_been_registered, memory_order_relaxed)) [[unlikely]] { \
+                        if (fiu_fail(name)) [[unlikely]] { \
+                                action; \
+                        } \
                 } \
         } while (0)
 
