@@ -142,6 +142,9 @@ __thread int rec_count = 0;
 /* Used to keep the last failinfo via TLS */
 static pthread_key_t last_failinfo_key;
 
+/* Used to shortcut checks in production */
+atomic_int has_any_failpoint_been_registered = 0;
+
 
 /*
  * Miscelaneous internal functions
@@ -416,6 +419,7 @@ int fiu_enable(const char *name, int failnum, void *failinfo,
 	if (pf == NULL)
 		return -1;
 
+    has_any_failpoint_been_registered = 1;
 	return insert_pf(pf);
 #if defined(__has_feature)
 # if __has_feature(address_sanitizer)
