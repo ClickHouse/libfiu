@@ -122,24 +122,6 @@ int fiu_enable_stack_by_name(const char *name, int failnum, void *failinfo,
  */
 int fiu_disable(const char *name);
 
-/** Returns whether the given point of failure is currently enabled and could
- * still cause a failure.
- *
- * A point is considered enabled if it has been registered via one of the
- * fiu_enable*() functions, has not been disabled, and \(em if it was
- * registered with FIU_ONETIME \(em has not yet consumed its one allowed
- * failure.
- *
- * Note this does not evaluate per-call fail decisions (probability roll or
- * stack check); a probability- or stack-based point will report as enabled
- * even when individual fiu_fail() calls happen not to fail. To learn whether
- * a call would fail right now, use fiu_fail() instead.
- *
- * @param name  Name of the point of failure.
- * @returns  1 if enabled, 0 otherwise (including before fiu_init()).
- */
-int fiu_status(const char *name);
-
 /** Enables remote control over a named pipe.
  *
  * The name pipe path will begin with the given basename. "-$PID" will be

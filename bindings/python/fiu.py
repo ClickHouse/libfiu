@@ -95,12 +95,6 @@ def disable(name):
 	if r != 0:
 		raise RuntimeError(r)
 
-def status(name):
-	"""Returns True if the given point of failure is currently enabled and
-	could still cause a failure, False otherwise. A consumed ONETIME point
-	reports False."""
-	return bool(_ll.status(name))
-
 def set_prng_seed(seed):
 	"""Sets the PRNG seed. Don't use this unless you know what you're
 	doing."""
