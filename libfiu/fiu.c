@@ -502,39 +502,4 @@ int fiu_disable(const char *name)
 	return success ? 0 : -1;
 }
 
-/* Returns 1 if the given name is currently registered as a failpoint and
- * could still cause a failure (i.e. not a one-time point that has already
- * fired), 0 otherwise. Safe to call before fiu_init(). */
-int fiu_status(const char *name)
-{
-	struct pf_info *pf;
-	int enabled = 0;
-
-	rec_count++;
-
-	ef_rlock();
-
-	/* fiu_init() may not have been called yet. */
-	if (enabled_fails == NULL)
-		goto exit;
-
-	pf = wtable_get(enabled_fails, name);
-	if (pf == NULL)
-		goto exit;
-
-	if (pf->flags & FIU_ONETIME) {
-		pthread_mutex_lock(&pf->lock);
-		enabled = pf->failed_once ? 0 : 1;
-		pthread_mutex_unlock(&pf->lock);
-	} else {
-		enabled = 1;
-	}
-
-exit:
-	ef_runlock();
-
-	rec_count--;
-	return enabled;
-}
-
 

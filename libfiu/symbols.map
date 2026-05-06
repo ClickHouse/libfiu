@@ -11,7 +11,6 @@
 		fiu_failinfo;
 		fiu_init;
 		fiu_set_prng_seed;
-		fiu_status;
 		fiu_rc_fifo;
 		fiu_rc_string;
 
