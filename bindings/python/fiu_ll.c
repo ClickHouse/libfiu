@@ -189,6 +189,16 @@ static PyObject *disable(PyObject *self, PyObject *args)
 	return PyLong_FromLong(fiu_disable(name));
 }
 
+static PyObject *status(PyObject *self, PyObject *args)
+{
+	char *name;
+
+	if (!PyArg_ParseTuple(args, "s:status", &name))
+		return NULL;
+
+	return PyLong_FromLong(fiu_status(name));
+}
+
 static PyObject *set_prng_seed(PyObject *self, PyObject *args)
 {
 	int seed;
@@ -220,6 +230,7 @@ static PyMethodDef fiu_methods[] = {
 	{ "enable_stack_by_name", (PyCFunction) enable_stack_by_name,
 		METH_VARARGS, NULL },
 	{ "disable", (PyCFunction) disable, METH_VARARGS, NULL },
+	{ "status", (PyCFunction) status, METH_VARARGS, NULL },
 	{ "set_prng_seed", (PyCFunction) set_prng_seed, METH_VARARGS, NULL },
 	{ "rc_fifo", (PyCFunction) rc_fifo, METH_VARARGS, NULL },
 	{ NULL }
