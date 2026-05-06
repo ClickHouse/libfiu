@@ -32,6 +32,7 @@ libfiu - Fault injection in userspace
 .BI "		void *" failinfo ", unsigned int " flags ","
 .BI "		const char *" func_name ", int " func_pos_in_stack ");"
 .BI "int fiu_disable(const char *" name ");"
+.BI "int fiu_status(const char *" name ");"
 .BI "int fiu_rc_fifo(const char *" basename ");"
 .sp
 .fi
@@ -205,6 +206,21 @@ platforms.
 Disables the given point of failure, undoing the actions of the
 .B fiu_enable*()
 functions.
+
+.TP
+.BI "fiu_status(" name ")"
+Returns whether the given point of failure is currently enabled and could
+still cause a failure. A point is considered enabled if it has been registered
+via one of the
+.B fiu_enable*()
+functions, has not been disabled, and \(em if it was registered with
+.I FIU_ONETIME
+\(em has not yet consumed its one allowed failure. Probability and stack-based
+points report as enabled even when individual
+.B fiu_fail()
+calls happen not to fail; that is a per-call decision rather than a state of
+the point. Returns 1 if enabled, 0 otherwise (including before
+.BR fiu_init() ).
 
 .TP
 .BI "fiu_rc_fifo(" basename ")"
