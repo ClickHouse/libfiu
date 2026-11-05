@@ -142,8 +142,14 @@ __thread int rec_count = 0;
 /* Used to keep the last failinfo via TLS */
 static pthread_key_t last_failinfo_key;
 
-/* Used to shortcut checks in production */
+/* Used to shortcut checks in production: non-zero while any point of failure
+ * is enabled. Only written with enabled_fails_lock held for writing. */
 atomic_int has_any_failpoint_been_registered = 0;
+
+static void update_fast_path_flag(void)
+{
+	has_any_failpoint_been_registered = wtable_count(enabled_fails) != 0;
+}
 
 
 /*
@@ -398,6 +404,7 @@ static int insert_pf(struct pf_info *pf)
 
 	ef_wlock();
 	success = wtable_set(enabled_fails, pf->name, pf);
+	update_fast_path_flag();
 	ef_wunlock();
 
 	rec_count--;
@@ -419,7 +426,6 @@ int fiu_enable(const char *name, int failnum, void *failinfo,
 	if (pf == NULL)
 		return -1;
 
-    has_any_failpoint_been_registered = 1;
 	return insert_pf(pf);
 #if defined(__has_feature)
 # if __has_feature(address_sanitizer)
@@ -516,6 +522,7 @@ int fiu_disable(const char *name)
 	/* Just find the point of failure and remove it. */
 	ef_wlock();
 	success = wtable_del(enabled_fails, name);
+	update_fast_path_flag();
 	ef_wunlock();
 
 	rec_count--;

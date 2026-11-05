@@ -10,6 +10,7 @@
 #define _WTABLE_H
 
 #include <stdbool.h>		/* for bool */
+#include <stddef.h>		/* for size_t */
 
 typedef struct wtable wtable_t;
 
@@ -19,6 +20,7 @@ void wtable_free(wtable_t *t);
 void *wtable_get(wtable_t *t, const char *key);
 bool wtable_set(wtable_t *t, const char *key, void *value);
 bool wtable_del(wtable_t *t, const char *key);
+size_t wtable_count(wtable_t *t);
 
 #endif
 

@@ -65,7 +65,7 @@ int fiu_fail(const char *name);
 void *fiu_failinfo(void);
 
 /// In production it's extremely unusual to use failpoints, but checking them has a cost (function call, global mutex lock, hash table lookup...)
-/// We've introduced this atomic variable to avoid that cost when no failpoints have been registered in the lifetime of the program
+/// We've introduced this atomic variable to avoid that cost when no failpoints are enabled
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wc11-extensions"
 extern atomic_int has_any_failpoint_been_registered;
