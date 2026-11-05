@@ -839,3 +839,9 @@ bool wtable_del(struct wtable *t, const char *key)
 	}
 }
 
+/* Returns the number of entries in the table. */
+size_t wtable_count(struct wtable *t)
+{
+	return t->finals->nentries + t->ws_used_count;
+}
+
