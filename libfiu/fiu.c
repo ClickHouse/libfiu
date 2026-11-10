@@ -105,7 +105,10 @@ exit:
 	return pf;
 }
 
-static void pf_free(struct pf_info *pf) {
+/* Takes a void * because it is the wtable destructor: calling it through
+ * another function type is undefined, and Clang CFI (cfi-icall) rejects it. */
+static void pf_free(void *value) {
+	struct pf_info *pf = value;
 	free(pf->name);
 	pthread_mutex_destroy(&pf->lock);
 	free(pf);
@@ -261,7 +264,7 @@ int fiu_init(unsigned int flags)
 
 	pthread_key_create(&last_failinfo_key, NULL);
 
-	enabled_fails = wtable_create((void (*)(void *)) pf_free);
+	enabled_fails = wtable_create(pf_free);
 
 	if (pthread_atfork(NULL, NULL, atfork_child) != 0) {
 		ef_wunlock();
